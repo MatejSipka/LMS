@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" hash="3379227392">
+    <data-source source="LOCAL" name="Derby - bplmsdb@localhost" uuid="c927cc2b-663a-4be5-bb7c-846738fe66ed">
+      <driver-ref>derby.remote</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.apache.derby.jdbc.ClientDriver</jdbc-driver>
+      <jdbc-url>jdbc:derby://localhost:1527/bplmsdb</jdbc-url>
+      <user-name>ryvola</user-name>
+      <user-password>dfd8dfd3dfdcdfc5dfc6dfcb</user-password>
+      <libraries />
+    </data-source>
+  </component>
+</project>
+
