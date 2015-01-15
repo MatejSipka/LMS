@@ -1,6 +1,8 @@
 package cz.muni.fi.xryvola;
 
 import javax.servlet.annotation.WebServlet;
+
+import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.navigator.Navigator;
@@ -12,6 +14,7 @@ import cz.muni.fi.xryvola.navigateApp.MainMenu;
 import cz.muni.fi.xryvola.services.*;
 
 @Theme("mytheme")
+@PreserveOnRefresh
 @SuppressWarnings("serial")
 public class MyVaadinUI extends UI
 {
@@ -40,6 +43,10 @@ public class MyVaadinUI extends UI
         Navigator.ComponentContainerViewDisplay viewDisplay = new Navigator.ComponentContainerViewDisplay(layout);
         navigator = new Navigator(UI.getCurrent(), viewDisplay);
         navigator.addView("", new MainMenu());
+    }
+
+    @Override
+    protected void refresh(VaadinRequest request) {
     }
 
     public SuperManager getSuperManager() {

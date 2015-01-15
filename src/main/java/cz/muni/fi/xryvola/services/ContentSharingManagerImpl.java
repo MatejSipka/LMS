@@ -19,6 +19,27 @@ public class ContentSharingManagerImpl implements ContentSharingManager {
     }
 
     @Override
+    public void createContentSharing(ContentSharing cs) {
+        em.getTransaction().begin();
+        em.persist(cs);
+        em.getTransaction().commit();
+    }
+
+    @Override
+    public void deleteContentSharing(Long id) {
+        ContentSharing cs = em.find(ContentSharing.class, id);
+        em.getTransaction().begin();
+        em.remove(cs);
+        em.getTransaction().commit();
+    }
+
+    @Override
+    public ContentSharing getContentSharingById(Long id) {
+        return em.find(ContentSharing.class, id);
+    }
+
+
+    @Override
     public void addPresentationInClassroom(Long presentation, Long classroom, Long author) {
         ContentSharing ch = new ContentSharing();
         ch.setClassroomId(classroom);
@@ -70,26 +91,23 @@ public class ContentSharingManagerImpl implements ContentSharingManager {
     }
 
     @Override
-    public Collection<Long> getPresentationsFromClassroom(Long classroom) {
-        Query q = em.createNativeQuery("SELECT DOCUMENTID FROM CONTENTSHARING WHERE CLASSROOMID = ? AND DOCUMENTTYPE LIKE ?")
-                .setParameter(1, classroom).setParameter(2, "PRESENTATION");
-        List<BigInteger> list = q.getResultList();
-        List<Long> result = new ArrayList<Long>();
-        for(BigInteger bi : list){
-            result.add(bi.longValue());
-        }
-        return result;
+    public Collection<ContentSharing> getContentSharingFromClassroom(Long classroom) {
+        Query q = em.createQuery("SELECT cs FROM ContentSharing cs WHERE cs.classroomId = :classId")
+                .setParameter("classId", classroom);
+        return q.getResultList();
     }
 
     @Override
-    public Collection<Long> getTestsFromClassroom(Long classroom) {
+    public Collection<ContentSharing> getPresentationsFromClassroom(Long classroom) {
+        Query q = em.createQuery("SELECT cs FROM ContentSharing cs WHERE cs.classroomId = :classId AND cs.documentType LIKE :docType")
+                .setParameter("classId", classroom).setParameter("docType", "PRESENTATION");
+        return q.getResultList();
+    }
+
+    @Override
+    public Collection<ContentSharing> getTestsFromClassroom(Long classroom) {
         Query q = em.createNativeQuery("SELECT DOCUMENTID FROM CONTENTSHARING WHERE CLASSROOMID = ? AND DOCUMENTTYPE LIKE ?")
                 .setParameter(1, classroom).setParameter(2, "TEST");
-        List<BigInteger> list = q.getResultList();
-        List<Long> result = new ArrayList<Long>();
-        for(BigInteger bi : list){
-            result.add(bi.longValue());
-        }
-        return result;
+        return q.getResultList();
     }
 }

@@ -9,6 +9,7 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
+import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.shared.ui.window.WindowMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
@@ -18,11 +19,9 @@ import cz.muni.fi.xryvola.components.MenuComponent;
 import cz.muni.fi.xryvola.filteredTable.MyFilterDecorator;
 import cz.muni.fi.xryvola.services.*;
 import org.tepi.filtertable.FilterTable;
-
-import javax.management.NotificationFilter;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -37,18 +36,18 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
     private VerticalLayout rightContent;
 
     //left side
-    Tree listOfClasses = new Tree("Moje třídy");
-    VerticalLayout classesButts;
+    private Tree listOfClasses = new Tree("Moje třídy");
+    private VerticalLayout classesButts;
 
     //right side - top
-    HorizontalLayout infoButts;
-    HorizontalLayout infoButtsMat;
-    HorizontalLayout infotButtsStu;
+    private HorizontalLayout infoButts;
+    private HorizontalLayout infoButtsMat;
+    private HorizontalLayout infotButtsStu;
     //right side - down
-    TabSheet classInfo = new TabSheet();
-    Table students = new Table();
-    FilterTable studentsToAdd = new FilterTable();
-    Table classContent = new Table();
+    private TabSheet classInfo = new TabSheet();
+    private Table students = new Table();
+    private FilterTable studentsToAdd = new FilterTable();
+    private Table classContent = new Table();
 
     private SuperManager superManager = ((MyVaadinUI)UI.getCurrent()).getSuperManager();
 
@@ -58,6 +57,7 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
     private ContentSharingManager CHManager = superManager.getContentSharingManager();
     private PresentationManager presentationManager = superManager.getPresentationManager();
     private TestManager testManager = superManager.getTestManager();
+    private ContentSharingManager contentSharingManager = superManager.getContentSharingManager();
 
     private Long currClassId = Long.valueOf(1);
     private List<Pair> studentClasses = new ArrayList<Pair>();
@@ -249,6 +249,8 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
                     addMatWin.setContent(addMatLay);
                     addMatLay.setMargin(true);
                     addMatLay.setSpacing(true);
+
+
                     final Tree newPresTree = new Tree("Moje prezentace");
                     //LIST OF MY CONTENT
                     addMatLay.addComponent(newPresTree);
@@ -264,9 +266,54 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
                         @Override
                         public void buttonClick(Button.ClickEvent clickEvent) {
                             if (newPresTree.getValue() != null) {
-                                CHManager.addPresentationInClassroom((Long) newPresTree.getValue(), currClassId, MyVaadinUI.currUser.getId());
-                                loadContentTable();
+
+                                final Long presId = (Long) newPresTree.getValue();
                                 addMatWin.close();
+                                final Window timeWin = new Window();
+                                HorizontalLayout timeWinLay = new HorizontalLayout();
+                                timeWin.center();
+                                timeWin.setModal(true);
+                                timeWin.setContent(timeWinLay);
+                                timeWinLay.setMargin(true);
+                                timeWinLay.setSpacing(true);
+
+                                final DateField when = new DateField();
+                                when.setValue(new Date());
+                                when.setResolution(Resolution.MINUTE);
+                                when.setCaption("Zveřejněno od:");
+
+                                final DateField till = new DateField();
+                                till.setValue(new Date());
+                                till.setResolution(Resolution.MINUTE);
+                                till.setCaption("Zveřejněno do:");
+
+                                timeWinLay.addComponents(when, till);
+
+                                Button acc = new Button("Přidat");
+                                timeWinLay.addComponent(acc);
+                                timeWinLay.setComponentAlignment(acc, Alignment.BOTTOM_RIGHT);
+                                acc.setClickShortcut(ShortcutAction.KeyCode.ENTER);
+                                acc.addClickListener(new Button.ClickListener() {
+                                    @Override
+                                    public void buttonClick(Button.ClickEvent clickEvent) {
+                                        ContentSharing ch = new ContentSharing();
+                                        ch.setDocumentType("PRESENTATION");
+                                        ch.setTeacherId(MyVaadinUI.currUser.getId());
+                                        ch.setDocumentId(presId);
+                                        ch.setClassroomId(currClassId);
+                                        ch.setWhen(when.getValue());
+                                        ch.getWhen().setSeconds(0);
+                                        ch.setTill(till.getValue());
+                                        ch.getTill().setSeconds(0);
+                                        superManager.getContentSharingManager().createContentSharing(ch);
+
+                                        loadContentTable();
+                                        timeWin.close();
+                                        addMatWin.close();
+
+                                    }
+                                });
+                                UI.getCurrent().addWindow(timeWin);
                             }
                         }
                     });
@@ -282,11 +329,51 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
                         @Override
                         public void buttonClick(Button.ClickEvent clickEvent) {
                             if (newTestTree.getValue() != null) {
-                                CHManager.addTestInClassroom((Long) newTestTree.getValue(), currClassId, MyVaadinUI.currUser.getId());
-                                Item it = classContent.addItem(newTestTree.getValue());
-                                it.getItemProperty("Název").setValue(testManager.getTestById((Long) newTestTree.getValue()).getName());
-                                it.getItemProperty("Typ").setValue("test");
+                                final Long testId = (Long) newTestTree.getValue();
                                 addMatWin.close();
+                                final Window timeWin = new Window();
+                                HorizontalLayout timeWinLay = new HorizontalLayout();
+                                timeWin.center();
+                                timeWin.setModal(true);
+                                timeWin.setContent(timeWinLay);
+                                timeWinLay.setMargin(true);
+                                timeWinLay.setSpacing(true);
+
+                                final DateField when = new DateField();
+                                when.setValue(new Date());
+                                when.setResolution(Resolution.MINUTE);
+                                when.setCaption("Zveřejněno od:");
+
+                                final DateField till = new DateField();
+                                till.setValue(new Date());
+                                till.setResolution(Resolution.MINUTE);
+                                till.setCaption("Zveřejněno do:");
+
+                                timeWinLay.addComponents(when, till);
+
+                                Button acc = new Button("Přidat");
+                                timeWinLay.addComponent(acc);
+                                timeWinLay.setComponentAlignment(acc, Alignment.BOTTOM_RIGHT);
+                                acc.setClickShortcut(ShortcutAction.KeyCode.ENTER);
+                                acc.addClickListener(new Button.ClickListener() {
+                                    @Override
+                                    public void buttonClick(Button.ClickEvent clickEvent) {
+                                        ContentSharing ch = new ContentSharing();
+                                        ch.setDocumentType("TEST");
+                                        ch.setTeacherId(MyVaadinUI.currUser.getId());
+                                        ch.setDocumentId(testId);
+                                        ch.setClassroomId(currClassId);
+                                        ch.setWhen(when.getValue());
+                                        ch.getWhen().setSeconds(0);
+                                        ch.setTill(till.getValue());
+                                        ch.getTill().setSeconds(0);
+                                        superManager.getContentSharingManager().createContentSharing(ch);
+                                        loadContentTable();
+                                        timeWin.close();
+                                        addMatWin.close();
+                                    }
+                                });
+                                UI.getCurrent().addWindow(timeWin);
                             }
                         }
                     });
@@ -301,13 +388,7 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 if (classContent.getValue() != null){
-                    String type = (String) classContent.getItem(classContent.getValue()).getItemProperty("Typ").getValue();
-                    System.out.println("CONTENT TYPE: " + type);
-                    if (type.equals("prezentace")){
-                        CHManager.deletePresentationFromClassroom((Long) classContent.getValue(), currClassId);
-                    }else{
-                        CHManager.deleteTestFromClassroom((Long) classContent.getValue(), currClassId);
-                    }
+                    contentSharingManager.deleteContentSharing((Long) classContent.getValue());
                     loadContentTable();
                 }
             }
@@ -363,7 +444,7 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
                     VerticalLayout root = new VerticalLayout();
                     root.setMargin(true);
                     root.setSpacing(true);
-                    root.addComponent(buildFilterTable());
+                    root.addComponent(buildtudentsFilterTable());
                     root.addComponent(acc);
                     addStudent.setContent(root);
                     UI.getCurrent().addWindow(addStudent);
@@ -384,6 +465,8 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
         classInfo.addTab(classContent, "Zveřejněný obsah");
         classContent.addContainerProperty("Název", String.class, null);
         classContent.addContainerProperty("Typ", String.class, null);
+        classContent.addContainerProperty("Od", Date.class, null);
+        classContent.addContainerProperty("Do", Date.class, null);
         classContent.setSelectable(true);
         classContent.setSizeFull();
 
@@ -422,19 +505,20 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
     private void loadContentTable(){
         classContent.removeAllItems();
         if (listOfClasses.getValue() != null) {
-            //LIST OF SHARED CONTENT - PRESENTATIONS
-            Collection<Long> press = CHManager.getPresentationsFromClassroom(currClassId);
-            for (Long l : press){
-                Item it = classContent.addItem(l);
-                it.getItemProperty("Název").setValue(presentationManager.getPresentationById(l).getName());
-                it.getItemProperty("Typ").setValue("prezentace");
-            }
-            //LIST OF SHARED CONTENT - TESTS
-            Collection<Long> tests = CHManager.getTestsFromClassroom(currClassId);
-            for (Long l : tests){
-                Item it = classContent.addItem(l);
-                it.getItemProperty("Název").setValue(testManager.getTestById(l).getName());
-                it.getItemProperty("Typ").setValue("test");
+            //LIST OF SHARED CONTENT
+            Collection<ContentSharing> press = CHManager.getContentSharingFromClassroom(currClassId);
+            for (ContentSharing cs : press){
+                Item it = classContent.addItem(cs.getId());
+                if (cs.getDocumentType().equals("PRESENTATION")) {
+                    it.getItemProperty("Název").setValue(presentationManager.getPresentationById(cs.getDocumentId()).getName());
+                    it.getItemProperty("Typ").setValue("prezentace");
+                }else if (cs.getDocumentType().equals("TEST")){
+                    it.getItemProperty("Název").setValue(testManager.getTestById(cs.getDocumentId()).getName());
+                    it.getItemProperty("Typ").setValue("test");
+                }
+
+                it.getItemProperty("Od").setValue(cs.getWhen());
+                it.getItemProperty("Do").setValue(cs.getTill());
             }
         }
         classContent.setPageLength(classContent.size());
@@ -461,9 +545,10 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent viewChangeEvent) {
 
+
     }
 
-    private FilterTable buildFilterTable() {
+    private FilterTable buildtudentsFilterTable() {
         studentsToAdd.setFilterDecorator(new MyFilterDecorator());
 
         studentsToAdd.setFilterBarVisible(true);
@@ -474,7 +559,7 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
 
         studentsToAdd.setColumnCollapsingAllowed(true);
         studentsToAdd.setColumnReorderingAllowed(true);
-        studentsToAdd.setContainerDataSource(buildContainer());
+        studentsToAdd.setContainerDataSource(buildStudentsContainer());
         studentsToAdd.setVisibleColumns((Object[]) new String[] { "Jméno", "Třída" });
         studentsToAdd.setItemDescriptionGenerator(new AbstractSelect.ItemDescriptionGenerator() {
 
@@ -490,7 +575,7 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
         return studentsToAdd;
     }
 
-    private Container buildContainer() {
+    private Container buildStudentsContainer() {
 
         IndexedContainer cont = new IndexedContainer();
 

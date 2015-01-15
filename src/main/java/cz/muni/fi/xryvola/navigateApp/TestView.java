@@ -23,6 +23,8 @@ public class TestView extends HorizontalSplitPanel implements View {
 
     private SuperManager superManager = ((MyVaadinUI)UI.getCurrent()).getSuperManager();
     private TestManager testManager = superManager.getTestManager();
+    private QuestionManager questionManager = superManager.getQuestionManager();
+    private AnswerManager answerManager = superManager.getAnswerManager();
 
     public TestView(Test test){
         currentTest = test;
@@ -62,6 +64,9 @@ public class TestView extends HorizontalSplitPanel implements View {
                 ndAns.setIsCorrect(false);
                 newQuest.getAnswers().add(stAns);
                 newQuest.getAnswers().add(ndAns);
+
+                questionManager.createQuestion(newQuest);
+
                 currentTest.getQuestions().add(newQuest);
                 testManager.updateTest(currentTest);
                 currentTest = testManager.getTestById(currentTest.getId());
@@ -163,10 +168,8 @@ public class TestView extends HorizontalSplitPanel implements View {
 
     }
 
-
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent viewChangeEvent) {
-
     }
 
     private Question getQuestion(Object id){
@@ -178,17 +181,20 @@ public class TestView extends HorizontalSplitPanel implements View {
         return null;
     }
 
-    private void loadQuestionTree() throws NullPointerException{
+    private void loadQuestionTree() {
         listOfQuestions.removeAllItems();
         for (Question question : currentTest.getQuestions()){
             listOfQuestions.addItem(question.getId());
             listOfQuestions.setItemCaption(question.getId(), question.getQuestion());
+            listOfQuestions.setChildrenAllowed(question.getId(), false);
+            /*
             for (Answer answer : question.getAnswers()){
                 listOfQuestions.addItem(answer.getId());
                 listOfQuestions.setItemCaption(answer.getId(), answer.getAnswer());
                 listOfQuestions.setParent(answer.getId(), question.getId());
                 listOfQuestions.setChildrenAllowed(answer.getId(), false);
             }
+            */
         }
         listOfQuestions.setImmediate(true);
         listOfQuestions.select(currQuestion.getId());

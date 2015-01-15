@@ -446,7 +446,6 @@ public class TeacherMaterialsView extends HorizontalLayout implements View {
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent viewChangeEvent) {
-        //jinak vytahne z databaze odpovedi, ktere maji id null
         loadPresTree();
         loadTestTree();
     }

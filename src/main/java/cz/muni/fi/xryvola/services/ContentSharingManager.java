@@ -8,6 +8,12 @@ import java.util.Collection;
  */
 public interface ContentSharingManager {
 
+    void createContentSharing(ContentSharing cs);
+
+    void deleteContentSharing(Long id);
+
+    ContentSharing getContentSharingById(Long id);
+
     void addPresentationInClassroom(Long presentation, Long classroom, Long author);
 
     void addTestInClassroom(Long test, Long classroom, Long author);
@@ -16,7 +22,9 @@ public interface ContentSharingManager {
 
     void deletePresentationFromClassroom(Long presentation, Long classroom);
 
-    Collection<Long> getPresentationsFromClassroom(Long classroom);
+    Collection<ContentSharing> getContentSharingFromClassroom(Long classroom);
 
-    Collection<Long> getTestsFromClassroom(Long classroom);
+    Collection<ContentSharing> getPresentationsFromClassroom(Long classroom);
+
+    Collection<ContentSharing> getTestsFromClassroom(Long classroom);
 }

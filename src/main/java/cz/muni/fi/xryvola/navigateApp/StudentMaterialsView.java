@@ -1,6 +1,9 @@
 package cz.muni.fi.xryvola.navigateApp;
 
 import com.vaadin.data.Item;
+import com.vaadin.data.Property;
+import com.vaadin.data.util.converter.StringToDateConverter;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.FontAwesome;
@@ -10,9 +13,14 @@ import cz.muni.fi.xryvola.MyVaadinUI;
 import cz.muni.fi.xryvola.components.MenuComponent;
 import cz.muni.fi.xryvola.components.SlideShowWIndow;
 import cz.muni.fi.xryvola.services.Classroom;
+import cz.muni.fi.xryvola.services.ContentSharing;
 import cz.muni.fi.xryvola.services.SuperManager;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by adam on 7.12.14.
@@ -21,56 +29,87 @@ public class StudentMaterialsView extends HorizontalLayout implements View {
 
     private SuperManager superManager;
 
+    private HorizontalLayout content;
     private VerticalLayout conTableLay;
     private VerticalLayout butts;
     private MenuComponent menu;
 
-    Table contentTable = new Table();
+    private Table contentTable = new Table();
+    private Button present;
+    private Button testing;
 
     public StudentMaterialsView(){
 
         this.superManager = ((MyVaadinUI)UI.getCurrent()).getSuperManager();
-
-        setSizeFull();
+        this.setSizeFull();
 
         menu = new MenuComponent(4);
         this.addComponent(menu);
 
-        conTableLay = new VerticalLayout();
-        butts = new VerticalLayout();
-        this.addComponents(conTableLay, butts);
+        content = new HorizontalLayout();
+        content.setSizeFull();
+        content.setMargin(true);
+        content.setSpacing(true);
+        addComponent(content);
+        setExpandRatio(content, 1.0f);
 
+
+        conTableLay = new VerticalLayout();
         initTable();
         initButts();
 
-
+        content.addComponent(conTableLay);
+        content.addComponent(butts);
     }
     private void initTable(){
         contentTable = new Table();
         contentTable.setSelectable(true);
-        conTableLay.addComponent(contentTable);
-        contentTable.addContainerProperty("Nazev", String.class, null);
+        contentTable.setImmediate(true);
+        contentTable.addContainerProperty("Název", String.class, null);
         contentTable.addContainerProperty("Typ", String.class, null);
+        contentTable.addContainerProperty("Autor", String.class, null);
+        contentTable.addContainerProperty("Od", Date.class, null);
+        contentTable.addContainerProperty("Do", Date.class, null);
 
-        Classroom myClassroom = MyVaadinUI.currUser.getMyClass();
-        Collection<Long> contentListPres = superManager.getContentSharingManager().getPresentationsFromClassroom(myClassroom.getId());
-        Collection<Long> contentListTest = superManager.getContentSharingManager().getTestsFromClassroom(myClassroom.getId());
+        loadTable();
 
-        for(Long l : contentListPres){
-            Item it = contentTable.addItem(l);
-            it.getItemProperty("Nazev").setValue(superManager.getPresentationManager().getPresentationById(l).getName());
-            it.getItemProperty("Typ").setValue("prezentace");
-        }
+        contentTable.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+                if (contentTable.getValue() != null) {
+                    Item it = contentTable.getItem(contentTable.getValue());
+                    String type = (String) it.getItemProperty("Typ").getValue();
+                    if (type.equals("test")) {
+                        testing.setVisible(true);
+                        present.setVisible(false);
+                    }else if (type.equals("prezentace")){
+                        testing.setVisible(false);
+                        present.setVisible(true);
+                    }
+                }else{
+                    present.setVisible(false);
+                    testing.setVisible(false);
+                }
+            }
+        });
 
-        for(Long l : contentListTest){
-            Item it = contentTable.addItem(l);
-            it.getItemProperty("Nazev").setValue(superManager.getTestManager().getTestById(l).getName());
-            it.getItemProperty("Typ").setValue("test");
-        }
+        StringToDateConverter tableConverter = new StringToDateConverter(){
+            @Override
+            public DateFormat getFormat(Locale locale){
+                return new SimpleDateFormat("dd.MM.yyyy HH:mm");
+            }
+        };
+        contentTable.setConverter("Do", tableConverter);
+        contentTable.setConverter("Od", tableConverter);
+
+        conTableLay.addComponent(contentTable);
     }
 
     private void initButts(){
-        final Button present = new Button("Prezentovat");
+        butts = new VerticalLayout();
+
+        present = new Button("Spustit prezentaci");
+        present.setVisible(false);
         present.setIcon(FontAwesome.DESKTOP);
         present.addStyleName(ValoTheme.BUTTON_QUIET);
         butts.addComponent(present);
@@ -78,27 +117,51 @@ public class StudentMaterialsView extends HorizontalLayout implements View {
         present.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                Window slideShow = new SlideShowWIndow(superManager.getPresentationManager().getPresentationById((Long) contentTable.getValue()));
+                Long presId = superManager.getContentSharingManager().getContentSharingById((Long) contentTable.getValue()).getDocumentId();
+                Window slideShow = new SlideShowWIndow(superManager.getPresentationManager().getPresentationById(presId));
             }
         });
-
-        final Button testing = new Button("Testovat");
+        testing = new Button("Spustit test");
+        testing.setVisible(false);
         testing.setIcon(FontAwesome.QUESTION);
         testing.addStyleName(ValoTheme.BUTTON_QUIET);
         butts.addComponent(testing);
         testing.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                UI.getCurrent().getNavigator().addView(MyVaadinUI.STUDENTTESTING, new StudentTestView(superManager.getTestManager().getTestById((Long)contentTable.getValue())));
+                Long testId = superManager.getContentSharingManager().getContentSharingById((Long) contentTable.getValue()).getDocumentId();
+                UI.getCurrent().getNavigator().addView(MyVaadinUI.STUDENTTESTING, new StudentTestView(superManager.getTestManager().getTestById(testId)));
                 UI.getCurrent().getNavigator().navigateTo(MyVaadinUI.STUDENTTESTING);
             }
         });
+    }
 
-
+    private void loadTable(){
+        contentTable.removeAllItems();
+        Classroom myClassroom = MyVaadinUI.currUser.getMyClass();
+        Collection<ContentSharing> contentListPres = superManager.getContentSharingManager().getContentSharingFromClassroom(myClassroom.getId());
+        Date curr = new Date();
+        //TODO FILTERED TABLE
+        for (ContentSharing cs : contentListPres){
+            if (cs.getWhen().before(curr) && cs.getTill().after(curr)) {
+                Item it = contentTable.addItem(cs.getId());
+                if (cs.getDocumentType().equals("PRESENTATION")){
+                    it.getItemProperty("Typ").setValue("prezentace");
+                    it.getItemProperty("Název").setValue(superManager.getPresentationManager().getPresentationById(cs.getDocumentId()).getName());
+                }else if (cs.getDocumentType().equals("TEST")){
+                    it.getItemProperty("Typ").setValue("test");
+                    it.getItemProperty("Název").setValue(superManager.getTestManager().getTestById(cs.getDocumentId()).getName());
+                }
+                it.getItemProperty("Autor").setValue(superManager.getPersonManager().getPersonById(cs.getTeacherId()).getName());
+                it.getItemProperty("Od").setValue(cs.getWhen());
+                it.getItemProperty("Do").setValue(cs.getTill());
+            }
+        }
+        contentTable.setPageLength(contentTable.size());
     }
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent viewChangeEvent) {
-
+        loadTable();
     }
 }
