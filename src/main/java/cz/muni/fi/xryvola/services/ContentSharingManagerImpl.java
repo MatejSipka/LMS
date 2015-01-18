@@ -48,6 +48,26 @@ public class ContentSharingManagerImpl implements ContentSharingManager {
         em.getTransaction().commit();
     }
 
+    @Override
+    public void deletePresentation(Long id) {
+        Query q = em.createNativeQuery("DELETE FROM CONTENTSHARING " +
+                "WHERE DOCUMENTID = ? AND DOCUMENTTYPE LIKE ?");
+        q.setParameter(1, id).setParameter(2, "PRESENTATION");
+        em.getTransaction().begin();
+        q.executeUpdate();
+        em.getTransaction().commit();
+    }
+
+    @Override
+    public void deleteTest(Long id) {
+        Query q = em.createNativeQuery("DELETE FROM CONTENTSHARING " +
+                "WHERE DOCUMENTID = ? AND DOCUMENTTYPE LIKE ?");
+        q.setParameter(1, id).setParameter(2, "TEST");
+        em.getTransaction().begin();
+        q.executeUpdate();
+        em.getTransaction().commit();
+    }
+
 
     @Override
     public void addPresentationInClassroom(Long presentation, Long classroom, Long author) {
@@ -77,8 +97,6 @@ public class ContentSharingManagerImpl implements ContentSharingManager {
 
     @Override
     public void deleteTestFromClassroom(Long test, Long classroom) {
-
-        System.out.println("DELETE >> TEST: " + test + " CLASSROOM: " + classroom);
         Query q = em.createNativeQuery("DELETE FROM CONTENTSHARING " +
                 "WHERE CLASSROOMID = ? AND DOCUMENTID = ? AND DOCUMENTTYPE LIKE ?");
         q.setParameter(1, classroom).setParameter(2, test).setParameter(3, "TEST");

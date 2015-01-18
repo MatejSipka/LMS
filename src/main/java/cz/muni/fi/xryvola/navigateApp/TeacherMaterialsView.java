@@ -189,8 +189,6 @@ public class TeacherMaterialsView extends HorizontalLayout implements View {
             }
         });
 
-
-        //TODO REMOVE CONTENT SHARING - TEST ALSO
         delete.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -198,6 +196,7 @@ public class TeacherMaterialsView extends HorizontalLayout implements View {
                 p.getPresentations().remove(superManager.getPresentationManager().getPresentationById((Long) listOfPresentations.getValue()));
                 superManager.getPersonManager().updatePerson(p);
                 superManager.getPresentationManager().deletePresentation((Long) listOfPresentations.getValue());
+                superManager.getContentSharingManager().deletePresentation((Long) listOfPresentations.getValue());
                 loadPresTree();
             }
         });
@@ -381,6 +380,7 @@ public class TeacherMaterialsView extends HorizontalLayout implements View {
                 p.getTests().remove(superManager.getTestManager().getTestById((Long) listOfTests.getValue()));
                 superManager.getPersonManager().updatePerson(p);
                 superManager.getTestManager().deleteTest((Long) listOfTests.getValue());
+                superManager.getContentSharingManager().deleteTest((Long) listOfTests.getValue());
                 loadTestTree();
             }
         });
