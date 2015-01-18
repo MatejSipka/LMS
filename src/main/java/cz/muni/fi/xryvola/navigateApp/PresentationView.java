@@ -126,16 +126,14 @@ public class PresentationView extends HorizontalSplitPanel implements View {
                         Slide newSlide = new Slide();
                         newSlide.setName(slideName.getValue());
                         newSlide.setHtmlContent("<h1 align=\"center\">" + slideName.getValue() + "</h1>");
+                        superManager.getSlideManager().createSlide(newSlide);
                         presentation.getSlides().add(newSlide);
                         superManager.getPresentationManager().updatePresentation(presentation);
                         presentation = superManager.getPresentationManager().getPresentationById(presentation.getId());
-
-                        slideContentArea.setValue("<h1>" + slideName.getValue() + "</h1>");
-                        slideName.setValue("Nový slide");
-
                         currentSlide = newSlide;
                         loadTree();
                         listOfSlides.select(presentation.getSlides().get(presentation.getSlides().size() - 1).getId());
+                        loadEditor();
                         newSlideWindow.close();
                     }
                 });
@@ -206,18 +204,6 @@ public class PresentationView extends HorizontalSplitPanel implements View {
         listOfSlides.setNullSelectionAllowed(false);
         loadTree();
         listOfSlides.select(presentation.getSlides().get(0).getId());
-
-        listOfSlides.addValueChangeListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
-                if (listOfSlides.getValue() != null) {
-                    presentationPageContent.removeComponent(slideContentArea);
-                    loadEditor();
-                    currentSlide = getSlide(listOfSlides.getValue());
-                    slideContentArea.setValue(currentSlide.getHtmlContent());
-                }
-            }
-        });
     }
 
     public void initPageContent(){
@@ -394,7 +380,19 @@ public class PresentationView extends HorizontalSplitPanel implements View {
         //MenuBar.MenuItem backgroundItem = showMenuBar.addItem("Zmenit pozadi", FontAwesome.PENCIL, colorPickerCmd);
 
         //SLIDE CONTENT - RICH TEXT AREA
+        slideContentArea = new CKEditorTextField();
+        presentationPageContent.addComponent(slideContentArea);
         loadEditor();
+
+        listOfSlides.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+                if (listOfSlides.getValue() != null) {
+                    currentSlide = getSlide(listOfSlides.getValue());
+                    loadEditor();
+                }
+            }
+        });
     }
 
     @Override
@@ -419,7 +417,6 @@ public class PresentationView extends HorizontalSplitPanel implements View {
     }
 
     private void loadTree(){
-        //slideManager = new SlideManagerImpl();
         listOfSlides.setNullSelectionAllowed(true);
         listOfSlides.removeAllItems();
         listOfSlides.setImmediate(true);
@@ -436,10 +433,12 @@ public class PresentationView extends HorizontalSplitPanel implements View {
     }
 
     private void loadEditor(){
+        presentationPageContent.removeComponent(slideContentArea);
         slideContentArea = new CKEditorTextField();
         slideContentArea.setWidth("822px");
         slideContentArea.setHeight("732px");
-        slideContentArea.setValue(presentation.getSlides().get(0).getHtmlContent());
+        slideContentArea.setValue(currentSlide.getHtmlContent());
+        System.out.println("IN LOAD EDITOR: " + currentSlide.getHtmlContent());
         presentationPageContent.addComponent(slideContentArea);
         presentationPageContent.setComponentAlignment(slideContentArea, Alignment.MIDDLE_CENTER);
 

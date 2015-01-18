@@ -38,6 +38,16 @@ public class ContentSharingManagerImpl implements ContentSharingManager {
         return em.find(ContentSharing.class, id);
     }
 
+    @Override
+    public void updateContentSharing(ContentSharing cs) {
+        em.getTransaction().begin();
+        ContentSharing csh = em.find(ContentSharing.class, cs.getId());
+        csh.setWhen(cs.getWhen());
+        csh.setTill(cs.getTill());
+        em.merge(csh);
+        em.getTransaction().commit();
+    }
+
 
     @Override
     public void addPresentationInClassroom(Long presentation, Long classroom, Long author) {

@@ -14,6 +14,8 @@ public interface ContentSharingManager {
 
     ContentSharing getContentSharingById(Long id);
 
+    void updateContentSharing(ContentSharing cs);
+
     void addPresentationInClassroom(Long presentation, Long classroom, Long author);
 
     void addTestInClassroom(Long test, Long classroom, Long author);

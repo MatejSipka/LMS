@@ -4,6 +4,7 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.data.util.converter.StringToDateConverter;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -19,10 +20,10 @@ import cz.muni.fi.xryvola.components.MenuComponent;
 import cz.muni.fi.xryvola.filteredTable.MyFilterDecorator;
 import cz.muni.fi.xryvola.services.*;
 import org.tepi.filtertable.FilterTable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by adam on 3.12.14.
@@ -48,6 +49,7 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
     private Table students = new Table();
     private FilterTable studentsToAdd = new FilterTable();
     private Table classContent = new Table();
+    private Button editContentSharing = new Button("Upravit");
 
     private SuperManager superManager = ((MyVaadinUI)UI.getCurrent()).getSuperManager();
 
@@ -393,6 +395,51 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
                 }
             }
         });
+
+        infoButtsMat.addComponent(editContentSharing);
+        editContentSharing.setIcon(FontAwesome.EDIT);
+        editContentSharing.addStyleName(ValoTheme.BUTTON_QUIET);
+        editContentSharing.setVisible(false);
+        editContentSharing.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                final ContentSharing cs = contentSharingManager.getContentSharingById((Long) classContent.getValue());
+
+                final Window timeWin = new Window();
+                timeWin.center();
+                timeWin.setModal(true);
+
+                HorizontalLayout timeLay = new HorizontalLayout();
+                timeLay.setSpacing(true);
+                timeLay.setMargin(true);
+
+                final DateField when = new DateField("Zveřejněno od:");
+                when.setResolution(Resolution.MINUTE);
+                when.setValue(cs.getWhen());
+                final DateField till = new DateField("Zveřejněno do:");
+                till.setResolution(Resolution.MINUTE);
+                till.setValue(cs.getTill());
+                timeLay.addComponents(when, till);
+                timeWin.setContent(timeLay);
+
+                Button save = new Button("Uložit");
+                save.setIcon(FontAwesome.SAVE);
+                timeLay.addComponent(save);
+                timeLay.setComponentAlignment(save, Alignment.BOTTOM_RIGHT);
+                save.addClickListener(new Button.ClickListener() {
+                    @Override
+                    public void buttonClick(Button.ClickEvent clickEvent) {
+                        cs.setWhen(when.getValue());
+                        cs.setTill(till.getValue());
+                        contentSharingManager.updateContentSharing(cs);
+                        loadContentTable();
+                        timeWin.close();
+                    }
+                });
+
+                UI.getCurrent().addWindow(timeWin);
+            }
+        });
     }
 
     private void initInfoButtsStu(){
@@ -470,15 +517,36 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
         classContent.setSelectable(true);
         classContent.setSizeFull();
 
+        StringToDateConverter tableConverter = new StringToDateConverter(){
+            @Override
+            public DateFormat getFormat(Locale locale){
+                return new SimpleDateFormat("dd.MM.yyyy HH:mm");
+            }
+        };
+
+        classContent.setConverter("Od", tableConverter);
+        classContent.setConverter("Do", tableConverter);
+
         classInfo.addSelectedTabChangeListener(new TabSheet.SelectedTabChangeListener() {
             @Override
             public void selectedTabChange(TabSheet.SelectedTabChangeEvent selectedTabChangeEvent) {
-                if (classInfo.getSelectedTab() == students){
+                if (classInfo.getSelectedTab() == students) {
                     infotButtsStu.setVisible(true);
                     infoButtsMat.setVisible(false);
-                }else{
+                } else {
                     infotButtsStu.setVisible(false);
                     infoButtsMat.setVisible(true);
+                }
+            }
+        });
+
+        classContent.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+                if (classContent.getValue() != null){
+                    editContentSharing.setVisible(true);
+                }else{
+                    editContentSharing.setVisible(false);
                 }
             }
         });
@@ -516,7 +584,6 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
                     it.getItemProperty("Název").setValue(testManager.getTestById(cs.getDocumentId()).getName());
                     it.getItemProperty("Typ").setValue("test");
                 }
-
                 it.getItemProperty("Od").setValue(cs.getWhen());
                 it.getItemProperty("Do").setValue(cs.getTill());
             }
@@ -569,9 +636,7 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
                 return "Just testing ItemDescriptionGenerator";
             }
         });
-
         studentsToAdd.setPageLength(studentsToAdd.getContainerDataSource().size());
-
         return studentsToAdd;
     }
 

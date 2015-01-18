@@ -20,7 +20,7 @@ public class Question {
 
     @OneToMany(cascade = CascadeType.ALL, fetch=FetchType.EAGER, orphanRemoval=true)
     @PrivateOwned
-    List<Answer> answers = new ArrayList<Answer>();
+    private List<Answer> answers = new ArrayList<Answer>();
 
     public Long getId() {
         return id;
@@ -43,7 +43,8 @@ public class Question {
     }
 
     public void setAnswers(List<Answer> answers) {
-        this.answers = answers;
+        this.answers.clear();
+        this.answers.addAll(answers);
     }
 
     @Override

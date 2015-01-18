@@ -183,11 +183,14 @@ public class TeacherMaterialsView extends HorizontalLayout implements View {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 Presentation presToEdit = superManager.getPresentationManager().getPresentationById((Long) listOfPresentations.getValue());
+                superManager.getEm().refresh(presToEdit);
                 UI.getCurrent().getNavigator().addView(MyVaadinUI.PRESENTATIONVIEW, new PresentationView(presToEdit));
                 UI.getCurrent().getNavigator().navigateTo(MyVaadinUI.PRESENTATIONVIEW);
             }
         });
 
+
+        //TODO REMOVE CONTENT SHARING - TEST ALSO
         delete.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -365,6 +368,7 @@ public class TeacherMaterialsView extends HorizontalLayout implements View {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 Test testToEdit = superManager.getTestManager().getTestById((Long) listOfTests.getValue());
+                superManager.getEm().refresh(testToEdit);
                 UI.getCurrent().getNavigator().addView(MyVaadinUI.TESTVIEW, new TestView(testToEdit));
                 UI.getCurrent().getNavigator().navigateTo(MyVaadinUI.TESTVIEW);
             }

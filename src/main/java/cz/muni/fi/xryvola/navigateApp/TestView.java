@@ -54,24 +54,31 @@ public class TestView extends HorizontalSplitPanel implements View {
         addQuest.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                Question newQuest = new Question();
-                newQuest.setQuestion("Otazka");
                 Answer stAns = new Answer();
                 stAns.setAnswer("");
                 stAns.setIsCorrect(false);
                 Answer ndAns = new Answer();
                 ndAns.setAnswer("");
                 ndAns.setIsCorrect(false);
+
+                //answerManager.createAnswer(stAns);
+                //answerManager.createAnswer(ndAns);
+
+                Question newQuest = new Question();
+                newQuest.setQuestion("Otazka");
+
                 newQuest.getAnswers().add(stAns);
                 newQuest.getAnswers().add(ndAns);
 
                 questionManager.createQuestion(newQuest);
 
+                //questionManager.updateQuestion(newQuest);
+
                 currentTest.getQuestions().add(newQuest);
                 testManager.updateTest(currentTest);
                 currentTest = testManager.getTestById(currentTest.getId());
+                currQuestion = newQuest;
                 questionCom = new QuestionComponent(newQuest);
-                currQuestion = getQuestion(newQuest.getId());
                 setFirstComponent(questionCom);
                 loadQuestionTree();
             }
