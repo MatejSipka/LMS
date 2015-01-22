@@ -45,4 +45,8 @@
     <inherits name="org.tepi.filtertable.gwt.FilterTableWidgetset" />
 
     <inherits name="org.vaadin.cssinject.Cssinject_addonWidgetset" />
+
+    
+
+    
 </module>

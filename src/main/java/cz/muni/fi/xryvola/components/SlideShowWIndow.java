@@ -6,7 +6,9 @@ import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.shared.ui.window.WindowMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
+import cz.muni.fi.xryvola.MyVaadinUI;
 import cz.muni.fi.xryvola.services.Presentation;
+import cz.muni.fi.xryvola.services.SuperManager;
 import org.vaadin.cssinject.CSSInject;
 
 /**

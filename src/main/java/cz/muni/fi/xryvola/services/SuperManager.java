@@ -21,6 +21,7 @@ public class SuperManager {
     private SlideManager slideManager;
     private TestManager testManager;
     private ContentSharingManager contentSharingManager;
+    private ActionManager actionManager;
 
     public SuperManager(){
 
@@ -36,6 +37,7 @@ public class SuperManager {
         slideManager = new SlideManagerImpl(em);
         testManager = new TestManagerImpl(em);
         contentSharingManager = new ContentSharingManagerImpl(em);
+        actionManager = new ActionManagerImpl(em);
     }
 
     public EntityManagerFactory getFactory() {
@@ -80,5 +82,9 @@ public class SuperManager {
 
     public ContentSharingManager getContentSharingManager() {
         return contentSharingManager;
+    }
+
+    public ActionManager getActionManager() {
+        return actionManager;
     }
 }

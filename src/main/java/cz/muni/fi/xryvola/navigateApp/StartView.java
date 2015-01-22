@@ -40,9 +40,9 @@ public class StartView extends HorizontalLayout implements View {
 
         initMainMenu();
 
-        if (MyVaadinUI.currUser.getRole() == "STUDENT"){
+        if (MyVaadinUI.currUser.getRole().equals("STUDENT")){
             initStartStudentContent();
-        }else{
+        }else if (MyVaadinUI.currUser.getRole().equals("TEACHER")){
             initStartTeacherContent();
         }
     }

@@ -15,6 +15,7 @@ import cz.muni.fi.xryvola.components.SlideShowWIndow;
 import cz.muni.fi.xryvola.services.Classroom;
 import cz.muni.fi.xryvola.services.ContentSharing;
 import cz.muni.fi.xryvola.services.SuperManager;
+import cz.muni.fi.xryvola.services.Test;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -30,7 +31,7 @@ public class StudentMaterialsView extends HorizontalLayout implements View {
     private SuperManager superManager;
 
     private HorizontalLayout content;
-    private VerticalLayout conTableLay;
+    private HorizontalLayout conTableLay;
     private VerticalLayout butts;
     private MenuComponent menu;
 
@@ -54,7 +55,23 @@ public class StudentMaterialsView extends HorizontalLayout implements View {
         setExpandRatio(content, 1.0f);
 
 
-        conTableLay = new VerticalLayout();
+        conTableLay = new HorizontalLayout();
+
+        Button refresh = new Button();
+        refresh.setStyleName(ValoTheme.BUTTON_ICON_ONLY);
+        refresh.setStyleName(ValoTheme.BUTTON_QUIET);
+        refresh.setIcon(FontAwesome.REFRESH);
+        refresh.setDescription("znovu načíst tabulku");
+        refresh.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                loadTable();
+            }
+        });
+        conTableLay.addComponent(refresh);
+        conTableLay.setComponentAlignment(refresh, Alignment.TOP_LEFT);
+
+
         initTable();
         initButts();
 
@@ -130,7 +147,9 @@ public class StudentMaterialsView extends HorizontalLayout implements View {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 Long testId = superManager.getContentSharingManager().getContentSharingById((Long) contentTable.getValue()).getDocumentId();
-                UI.getCurrent().getNavigator().addView(MyVaadinUI.STUDENTTESTING, new StudentTestView(superManager.getTestManager().getTestById(testId)));
+                Test test = superManager.getTestManager().getTestById(testId);
+                superManager.getEm().refresh(test);
+                UI.getCurrent().getNavigator().addView(MyVaadinUI.STUDENTTESTING, new StudentTestView(test));
                 UI.getCurrent().getNavigator().navigateTo(MyVaadinUI.STUDENTTESTING);
             }
         });
