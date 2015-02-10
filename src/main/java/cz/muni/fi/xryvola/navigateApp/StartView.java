@@ -40,9 +40,9 @@ public class StartView extends HorizontalLayout implements View {
 
         initMainMenu();
 
-        if (MyVaadinUI.currUser.getRole().equals("STUDENT")){
+        if (((MyVaadinUI)UI.getCurrent()).getCurrentUser().getRole().equals("STUDENT")){
             initStartStudentContent();
-        }else if (MyVaadinUI.currUser.getRole().equals("TEACHER")){
+        }else if (((MyVaadinUI)UI.getCurrent()).getCurrentUser().getRole().equals("TEACHER")){
             initStartTeacherContent();
         }
     }
@@ -70,8 +70,8 @@ public class StartView extends HorizontalLayout implements View {
 
         DataSeries dataSeries = new DataSeries()
                 .newSeries()
-                .add("First", MyVaadinUI.currUser.getScore());
-        dataSeries.newSeries().add("First", 100 - MyVaadinUI.currUser.getScore());
+                .add("First", ((MyVaadinUI)UI.getCurrent()).getCurrentUser().getScore());
+        dataSeries.newSeries().add("First", 100 - ((MyVaadinUI)UI.getCurrent()).getCurrentUser().getScore());
 
         SeriesDefaults seriesDefaults = new SeriesDefaults()
                 .setRenderer(SeriesRenderers.DONUT)

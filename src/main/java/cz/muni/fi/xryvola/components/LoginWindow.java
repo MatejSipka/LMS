@@ -7,6 +7,7 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import cz.muni.fi.xryvola.MyVaadinUI;
 import cz.muni.fi.xryvola.navigateApp.StartView;
+import cz.muni.fi.xryvola.services.Person;
 import cz.muni.fi.xryvola.services.SuperManager;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
@@ -71,8 +72,9 @@ public class LoginWindow extends Window {
                     token.setRememberMe(true);
                     try {
                         currentUser.login(token);
-                        MyVaadinUI.currUser = superManager.getPersonManager().getPersonByUsername(currentUser.getPrincipal().toString());
-                        System.out.println("User [" + MyVaadinUI.currUser.getUsername() + "] logged in successfully.");
+                        Person p = superManager.getPersonManager().getPersonByUsername(currentUser.getPrincipal().toString());
+                        ((MyVaadinUI)UI.getCurrent()).setCurrentUser(p);
+                        System.out.println("User [" + ((MyVaadinUI)UI.getCurrent()).getCurrentUser().getUsername() + "] logged in successfully.");
                         UI.getCurrent().getNavigator().addView(MyVaadinUI.STARTVIEW, new StartView());
                         UI.getCurrent().getNavigator().navigateTo(MyVaadinUI.STARTVIEW);
                         close();

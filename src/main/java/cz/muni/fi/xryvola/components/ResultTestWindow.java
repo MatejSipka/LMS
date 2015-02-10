@@ -114,7 +114,7 @@ public class ResultTestWindow extends Window {
 
         SeriesDefaults seriesDefaults = new SeriesDefaults()
                 .setRenderer(SeriesRenderers.DONUT)
-                .setRendererOptions(new DonutRenderer().setStartAngle(0).setShowDataLabels(true).setSliceMargin(3)).setShadow(true);
+                .setRendererOptions(new DonutRenderer().setStartAngle(0).setShowDataLabels(true).setSliceMargin(0)).setShadow(true);
 
         Grid grid = new Grid()
                 .setDrawBorder(false)
@@ -134,7 +134,7 @@ public class ResultTestWindow extends Window {
 
         Options options = new Options()
                 .setSeriesDefaults(seriesDefaults)
-                .setSeriesColors("#00A20B", "#f00")
+                .setSeriesColors("#00A20B", "white")
                 .setGrid(grid)
                 .setLegend(legend);
 
@@ -172,7 +172,9 @@ public class ResultTestWindow extends Window {
 
         DataSeries dataSeries = new DataSeries();
 
-        history = history.subList(history.size()-8, history.size()-1);
+        if (history.size() > 8) {
+            history = history.subList(history.size() - 8, history.size() - 1);
+        }
 
         for (Action a : history){
             dataSeries.add(a.getResult());
@@ -192,6 +194,7 @@ public class ResultTestWindow extends Window {
         Highlighter highlighter = new Highlighter()
                 .setShow(false);
 
+
         CanvasOverlay averageLine = new CanvasOverlay().setShow(true)
                 .setObject(new HorizontalLine().setY(average).setLineWidth(4).setColor("green").setShadow(true))
                 .setObject(new HorizontalLine().setY(maxScore).setLineWidth(2).setColor("black").setShadow(true));
@@ -200,7 +203,7 @@ public class ResultTestWindow extends Window {
                 .setSeriesDefaults(seriesDefaults)
                 .setAxes(axes)
                 .setHighlighter(highlighter)
-                .setCanvasOverlay(averageLine);
+                .setCanvasOverlay(averageLine).setSeriesColors("#4D8FF2");
 
         DCharts chart = new DCharts()
                 .setDataSeries(dataSeries)
@@ -217,7 +220,7 @@ public class ResultTestWindow extends Window {
 
         conti.setStyleName(ValoTheme.BUTTON_BORDERLESS);
         conti.setStyleName(ValoTheme.BUTTON_QUIET);
-        conti.setIcon(FontAwesome.REFRESH);
+        conti.setIcon(FontAwesome.CHEVRON_RIGHT);
 
         close.setStyleName(ValoTheme.BUTTON_BORDERLESS);
         close.setStyleName(ValoTheme.BUTTON_QUIET);
@@ -231,7 +234,6 @@ public class ResultTestWindow extends Window {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 close();
-                //TODO !!!!!!!FUNKCE NA OZNACENI SPRAVNYCH
             }
         });
 

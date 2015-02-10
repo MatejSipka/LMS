@@ -29,6 +29,9 @@ public class StudentTestView extends VerticalLayout implements View {
     private Test t;
     private SuperManager superManager;
 
+    private Button close;
+    private Button.ClickListener clickListener;
+
     public StudentTestView(Test test){
         this.t = test;
         this.superManager = ((MyVaadinUI)UI.getCurrent()).getSuperManager();
@@ -58,8 +61,8 @@ public class StudentTestView extends VerticalLayout implements View {
             this.addComponent(component);
         }
 
-        Button close = new Button("Vyhodnotit");
-        close.addClickListener(new Button.ClickListener() {
+        close = new Button("Vyhodnotit");
+        clickListener = new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 Action act = new Action();
@@ -69,19 +72,37 @@ public class StudentTestView extends VerticalLayout implements View {
                 act.setVerb("passed");
                 int score = 0;
                 for (QuestionTestingComponent com : questions){
-                   score += com.getIsCorrect();
+                    score += com.getIsCorrect();
                 }
                 act.setResult((long) score);
                 superManager.getActionManager().createAction(act);
-                MyVaadinUI.currUser.setScore(MyVaadinUI.currUser.getScore() + score);
-                superManager.getPersonManager().updatePerson(MyVaadinUI.currUser);
+                ((MyVaadinUI)UI.getCurrent()).getCurrentUser().setScore(((MyVaadinUI)UI.getCurrent()).getCurrentUser().getScore() + score);
+                superManager.getPersonManager().updatePerson(((MyVaadinUI)UI.getCurrent()).getCurrentUser());
                 UI.getCurrent().addWindow(new ResultTestWindow(t, score));
-                UI.getCurrent().getNavigator().navigateTo(MyVaadinUI.STUDENTCONTENTVIEW);
+                setResult();
             }
-        });
+        };
+        close.addClickListener(clickListener);
+
+
         close.setStyleName(ValoTheme.BUTTON_FRIENDLY);
         this.addComponent(close);
         this.setComponentAlignment(close, Alignment.BOTTOM_CENTER);
+    }
+
+    private void setResult(){
+        close.setCaption("Zavřít");
+        close.removeClickListener(clickListener);
+        close.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                UI.getCurrent().getNavigator().navigateTo(MyVaadinUI.STUDENTCONTENTVIEW);
+            }
+        });
+        for (QuestionTestingComponent component : questions){
+            component.check();
+        }
+
     }
 
     @Override

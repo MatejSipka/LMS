@@ -25,9 +25,10 @@ public class QuestionManagerImpl implements QuestionManager {
         em.getTransaction().begin();
         Question q = em.find(Question.class, question.getId());
         q.setQuestion(question.getQuestion());
-        q.setAnswers(question.getAnswers());
+        //q.setAnswers(question.getAnswers());
         em.merge(q);
         em.getTransaction().commit();
+        em.refresh(q);
     }
 
     @Override

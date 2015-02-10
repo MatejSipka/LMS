@@ -36,22 +36,22 @@ public class MyFilterDecorator implements FilterDecorator, Serializable {
 
     @Override
     public String getFromCaption() {
-        return null;
+        return "Od";
     }
 
     @Override
     public String getToCaption() {
-        return null;
+        return "Do";
     }
 
     @Override
     public String getSetCaption() {
-        return null;
+        return "Nastavit";
     }
 
     @Override
     public String getClearCaption() {
-        return null;
+        return "Vymazat";
     }
 
     @Override
@@ -76,7 +76,7 @@ public class MyFilterDecorator implements FilterDecorator, Serializable {
 
     @Override
     public int getTextChangeTimeout(Object propertyId) {
-        return 10;
+        return 5;
     }
 
     @Override

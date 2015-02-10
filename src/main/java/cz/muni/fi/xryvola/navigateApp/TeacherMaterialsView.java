@@ -137,11 +137,11 @@ public class TeacherMaterialsView extends HorizontalLayout implements View {
                             newPres.getSlides().add(title);
 
                             //UPDATE
-                            Person p = superManager.getPersonManager().getPersonById(MyVaadinUI.currUser.getId());
+                            Person p = superManager.getPersonManager().getPersonById(((MyVaadinUI)UI.getCurrent()).getCurrentUser().getId());
                             superManager.getPresentationManager().createPresentation(newPres);
                             p.getPresentations().add(newPres);
                             superManager.getPersonManager().updatePerson(p);
-                            MyVaadinUI.currUser = p;
+                            ((MyVaadinUI)UI.getCurrent()).setCurrentUser(p);
 
                             //ADD PRES VIEW
                             UI.getCurrent().getNavigator().addView(MyVaadinUI.PRESENTATIONVIEW, new PresentationView(newPres));
@@ -192,7 +192,7 @@ public class TeacherMaterialsView extends HorizontalLayout implements View {
         delete.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                Person p = MyVaadinUI.currUser;
+                Person p = ((MyVaadinUI)UI.getCurrent()).getCurrentUser();
                 p.getPresentations().remove(superManager.getPresentationManager().getPresentationById((Long) listOfPresentations.getValue()));
                 superManager.getPersonManager().updatePerson(p);
                 superManager.getPresentationManager().deletePresentation((Long) listOfPresentations.getValue());
@@ -314,11 +314,11 @@ public class TeacherMaterialsView extends HorizontalLayout implements View {
                             newTest.setName(testName.getValue());
 
                             //UPDATE
-                            Person p = superManager.getPersonManager().getPersonById(MyVaadinUI.currUser.getId());
+                            Person p = superManager.getPersonManager().getPersonById(((MyVaadinUI)UI.getCurrent()).getCurrentUser().getId());
                             superManager.getTestManager().createTest(newTest);
                             p.getTests().add(newTest);
                             superManager.getPersonManager().updatePerson(p);
-                            MyVaadinUI.currUser = p;
+                            ((MyVaadinUI)UI.getCurrent()).setCurrentUser(p);
 
                             /*NAVIGATE TO TEST VIEW*/
                             UI.getCurrent().getNavigator().addView(MyVaadinUI.TESTVIEW, new TestView(newTest));
@@ -376,7 +376,7 @@ public class TeacherMaterialsView extends HorizontalLayout implements View {
         delete.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                Person p = MyVaadinUI.currUser;
+                Person p = ((MyVaadinUI)UI.getCurrent()).getCurrentUser();
                 p.getTests().remove(superManager.getTestManager().getTestById((Long) listOfTests.getValue()));
                 superManager.getPersonManager().updatePerson(p);
                 superManager.getTestManager().deleteTest((Long) listOfTests.getValue());
@@ -435,8 +435,8 @@ public class TeacherMaterialsView extends HorizontalLayout implements View {
         downloadPDF.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                MyVaadinUI.currUser.setScore(MyVaadinUI.currUser.getScore()+5);
-                superManager.getPersonManager().updatePerson(MyVaadinUI.currUser);
+                ((MyVaadinUI)UI.getCurrent()).getCurrentUser().setScore(((MyVaadinUI)UI.getCurrent()).getCurrentUser().getScore()+5);
+                superManager.getPersonManager().updatePerson(((MyVaadinUI)UI.getCurrent()).getCurrentUser());
                 PDFGenerator generator = new PDFGenerator();
                 Test tmp = superManager.getTestManager().getTestById((Long) listOfTests.getValue());
                 generator.generateTest(tmp, withResult.getValue(), String.valueOf(tmp.getId()));
@@ -455,7 +455,7 @@ public class TeacherMaterialsView extends HorizontalLayout implements View {
     }
 
     private Presentation getPresentation(Object id){
-        for (Presentation presentation : MyVaadinUI.currUser.getPresentations()){
+        for (Presentation presentation : ((MyVaadinUI)UI.getCurrent()).getCurrentUser().getPresentations()){
             if (presentation.getId() == id){
                 return presentation;
             }
@@ -464,7 +464,7 @@ public class TeacherMaterialsView extends HorizontalLayout implements View {
     }
 
     private Test getTest(Object id){
-        for (Test test : MyVaadinUI.currUser.getTests()){
+        for (Test test : ((MyVaadinUI)UI.getCurrent()).getCurrentUser().getTests()){
             if (test.getId() == id){
                 return test;
             }
@@ -476,7 +476,7 @@ public class TeacherMaterialsView extends HorizontalLayout implements View {
         listOfPresentations.removeAllItems();
         listOfPresentations.setImmediate(true);
 
-        List<Presentation> myPresentations = MyVaadinUI.currUser.getPresentations();
+        List<Presentation> myPresentations = ((MyVaadinUI)UI.getCurrent()).getCurrentUser().getPresentations();
 
         for (Presentation pres : myPresentations){
             listOfPresentations.addItem(pres.getId());
@@ -489,7 +489,7 @@ public class TeacherMaterialsView extends HorizontalLayout implements View {
         listOfTests.removeAllItems();
         listOfTests.setImmediate(true);
 
-        List<Test> myTests = MyVaadinUI.currUser.getTests();
+        List<Test> myTests = ((MyVaadinUI)UI.getCurrent()).getCurrentUser().getTests();
 
         for (Test test : myTests){
             listOfTests.addItem(test.getId());

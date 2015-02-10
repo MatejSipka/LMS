@@ -157,7 +157,7 @@ public class StudentMaterialsView extends HorizontalLayout implements View {
 
     private void loadTable(){
         contentTable.removeAllItems();
-        Classroom myClassroom = MyVaadinUI.currUser.getMyClass();
+        Classroom myClassroom = ((MyVaadinUI)UI.getCurrent()).getCurrentUser().getMyClass();
         Collection<ContentSharing> contentListPres = superManager.getContentSharingManager().getContentSharingFromClassroom(myClassroom.getId());
         Date curr = new Date();
         //TODO FILTERED TABLE

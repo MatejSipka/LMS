@@ -19,7 +19,7 @@ public class QuestionComponent extends CustomComponent {
     private List<AnswerComponent> listOfAns = new ArrayList();
     private TextField questionField = new TextField();
     private SuperManager superManager;
-    public QuestionComponent(Question quest){
+    public QuestionComponent(final Question quest){
 
         this.superManager = ((MyVaadinUI)UI.getCurrent()).getSuperManager();
         this.question = quest;
@@ -62,6 +62,7 @@ public class QuestionComponent extends CustomComponent {
                 question.getAnswers().add(temp);
                 superManager.getQuestionManager().updateQuestion(question);
                 question = superManager.getQuestionManager().getQuestionById(question.getId());
+                superManager.getEm().refresh(question);
                 AnswerComponent newAnswer = new AnswerComponent(temp);
                 answerLay.addComponent(newAnswer);
                 listOfAns.add(newAnswer);

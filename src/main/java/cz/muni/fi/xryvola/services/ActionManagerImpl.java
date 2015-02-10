@@ -42,7 +42,9 @@ public class ActionManagerImpl implements ActionManager {
 
     @Override
     public List<Action> getActionsByDocument(Long docId) {
-        return null;
+        Query q = em.createQuery("SELECT action FROM Action action WHERE action.what = :docId")
+                .setParameter("docId", docId);
+        return q.getResultList();
     }
 
     @Override

@@ -146,10 +146,10 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
                             classroomManager.createClassroom(c);
                             //TEST OUTPUT
                             System.out.println("ADDED CLASS: " + c.getId() + " :: NAME: " + c.getName());
-                            Person p = personManager.getPersonById(MyVaadinUI.currUser.getId());
+                            Person p = personManager.getPersonById(((MyVaadinUI)UI.getCurrent()).getCurrentUser().getId());
                             p.getClassrooms().add(c);
                             personManager.updatePerson(p);
-                            MyVaadinUI.currUser = p;
+                            ((MyVaadinUI)UI.getCurrent()).setCurrentUser(p);
                             loadClassTree();
                             newClassWin.close();
                         }
@@ -162,8 +162,8 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
                 final Tree classes = new Tree();
                 newClassSheetTab2.addComponent(classes);
                 Collection<Classroom> classrooms1 = classroomManager.getClassroomsFromSchool
-                        (schoolManager.getSchoolByTeacher(MyVaadinUI.currUser));
-                classrooms1.removeAll(MyVaadinUI.currUser.getClassrooms());
+                        (schoolManager.getSchoolByTeacher(((MyVaadinUI)UI.getCurrent()).getCurrentUser()));
+                classrooms1.removeAll(((MyVaadinUI)UI.getCurrent()).getCurrentUser().getClassrooms());
                 for (Classroom classroom : classrooms1){
                     classes.addItem(classroom.getId());
                     classes.setItemCaption(classroom.getId(), classroom.getName());
@@ -181,10 +181,10 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
                 acc2.addClickListener(new Button.ClickListener() {
                     @Override
                     public void buttonClick(Button.ClickEvent clickEvent) {
-                        Person p = MyVaadinUI.currUser;
+                        Person p = ((MyVaadinUI)UI.getCurrent()).getCurrentUser();
                         //((Teacher)p).getClassrooms().add(classroomManager.getClassroomById((Long) classes.getValue()));
                         personManager.updatePerson(p);
-                        MyVaadinUI.currUser = p;
+                        ((MyVaadinUI)UI.getCurrent()).setCurrentUser(p);
                         loadClassTree();
                         newClassWin.close();
                     }
@@ -202,9 +202,9 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 if (listOfClasses.getValue() != null) {
-                    MyVaadinUI.currUser.getClassrooms().remove(classroomManager.getClassroomById((Long) listOfClasses.getValue()));
-                    personManager.updatePerson(MyVaadinUI.currUser);
-                    MyVaadinUI.currUser = personManager.getPersonById(MyVaadinUI.currUser.getId());
+                    ((MyVaadinUI)UI.getCurrent()).getCurrentUser().getClassrooms().remove(classroomManager.getClassroomById((Long) listOfClasses.getValue()));
+                    personManager.updatePerson(((MyVaadinUI)UI.getCurrent()).getCurrentUser());
+                    //MyVaadinUI.currUser = personManager.getPersonById(MyVaadinUI.currUser.getId());
                     loadClassTree();
                 }
             }
@@ -256,7 +256,7 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
                     final Tree newPresTree = new Tree("Moje prezentace");
                     //LIST OF MY CONTENT
                     addMatLay.addComponent(newPresTree);
-                    Person p = MyVaadinUI.currUser;
+                    Person p = ((MyVaadinUI)UI.getCurrent()).getCurrentUser();
                     for (Presentation pres : p.getPresentations()) {
                         newPresTree.addItem(pres.getId());
                         newPresTree.setItemCaption(pres.getId(), pres.getName());
@@ -300,7 +300,7 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
                                     public void buttonClick(Button.ClickEvent clickEvent) {
                                         ContentSharing ch = new ContentSharing();
                                         ch.setDocumentType("PRESENTATION");
-                                        ch.setTeacherId(MyVaadinUI.currUser.getId());
+                                        ch.setTeacherId(((MyVaadinUI)UI.getCurrent()).getCurrentUser().getId());
                                         ch.setDocumentId(presId);
                                         ch.setClassroomId(currClassId);
                                         ch.setWhen(when.getValue());
@@ -362,7 +362,7 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
                                     public void buttonClick(Button.ClickEvent clickEvent) {
                                         ContentSharing ch = new ContentSharing();
                                         ch.setDocumentType("TEST");
-                                        ch.setTeacherId(MyVaadinUI.currUser.getId());
+                                        ch.setTeacherId(((MyVaadinUI)UI.getCurrent()).getCurrentUser().getId());
                                         ch.setDocumentId(testId);
                                         ch.setClassroomId(currClassId);
                                         ch.setWhen(when.getValue());
@@ -559,7 +559,7 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
         listOfClasses.removeAllItems();
         String name = "";
         try {
-            for (Classroom c : MyVaadinUI.currUser.getClassrooms()){
+            for (Classroom c : ((MyVaadinUI)UI.getCurrent()).getCurrentUser().getClassrooms()){
                     listOfClasses.addItem(c.getId());
                     listOfClasses.setItemCaption(c.getId(), c.getName());
                     listOfClasses.setChildrenAllowed(c.getId(), false);
@@ -595,7 +595,6 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
     private void loadStudentsTable(){
         students.removeAllItems();
         if (listOfClasses.getValue() != null){
-            //LIST OF STUDENTS
             Classroom classroom = classroomManager.getClassroomById((Long) listOfClasses.getValue());
             for (Person student : classroom.getStudents()) {
                 Item it = students.addItem(student.getId());
@@ -647,7 +646,7 @@ public class TeacherStudentsView extends HorizontalLayout implements View {
         cont.addContainerProperty("Jméno", String.class, null);
         cont.addContainerProperty("Třída", String.class, null);
 
-        School school = schoolManager.getSchoolByTeacher(MyVaadinUI.currUser);
+        School school = schoolManager.getSchoolByTeacher(((MyVaadinUI)UI.getCurrent()).getCurrentUser());
         final Collection<Classroom> classrooms = classroomManager.getClassroomsFromSchool(school);
         for (Classroom classroom : classrooms) {
             for (Person student : classroom.getStudents()) {

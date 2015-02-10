@@ -169,7 +169,11 @@
             <artifactId>filteringtable</artifactId>
             <version>0.9.11.v7</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.vaadin.addon</groupId>
+            <artifactId>tableexport-for-vaadin</artifactId>
+            <version>1.5.1.5</version>
+        </dependency>
     </dependencies>
 	<build>
 		<plugins>

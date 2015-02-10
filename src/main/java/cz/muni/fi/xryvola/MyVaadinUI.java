@@ -10,6 +10,7 @@ import com.vaadin.navigator.Navigator;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import cz.muni.fi.xryvola.navigateApp.MainMenu;
@@ -30,8 +31,9 @@ public class MyVaadinUI extends UI
     public static final String TEACHERSTUDENTVIEW = "teacherstudent";
     public static final String STUDENTCONTENTVIEW = "studentcontent";
     public static final String STUDENTTESTING = "studenttesting";
-    public static Person currUser = null;
-    public static SuperManager superManager = null;
+    public static final String TEACHERSTATICS = "teacherstatics";
+    public Person currUser = null;
+    public SuperManager superManager = null;
 
     @WebServlet(value = "/*", asyncSupported = true)
     @VaadinServletConfiguration(productionMode = false, ui = MyVaadinUI.class, widgetset = "cz.muni.fi.xryvola.AppWidgetSet")
@@ -53,5 +55,11 @@ public class MyVaadinUI extends UI
 
     public SuperManager getSuperManager() {
         return superManager;
+    }
+
+    public Person getCurrentUser(){ return currUser; }
+
+    public void setCurrentUser(Person currUser) {
+        this.currUser = currUser;
     }
 }

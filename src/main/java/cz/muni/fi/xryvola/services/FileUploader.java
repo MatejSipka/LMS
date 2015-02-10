@@ -39,7 +39,7 @@ public class FileUploader extends CustomComponent implements Upload.Receiver, Up
     public OutputStream receiveUpload(String filename,
                                       String MIMEType) {
         FileOutputStream fos = null; // Output stream to write to
-        file = new File(MyVaadinUI.MYFILEPATH + "images/"+ MyVaadinUI.currUser.getUsername() +".png");
+        file = new File(MyVaadinUI.MYFILEPATH + "images/"+ ((MyVaadinUI)UI.getCurrent()).getCurrentUser().getUsername() +".png");
         try {
             // Open the file for writing.
             fos = new FileOutputStream(file);
@@ -54,7 +54,7 @@ public class FileUploader extends CustomComponent implements Upload.Receiver, Up
 
     // This is called if the upload is finished.
     public void uploadSucceeded(Upload.SucceededEvent event) {
-        String cmd = "convert " + MyVaadinUI.MYFILEPATH +  "images/"+ MyVaadinUI.currUser.getUsername() +".png -resize 100x100 "+ MyVaadinUI.MYFILEPATH + "images/" + MyVaadinUI.currUser.getUsername() + ".png";
+        String cmd = "convert " + MyVaadinUI.MYFILEPATH +  "images/"+ ((MyVaadinUI)UI.getCurrent()).getCurrentUser().getUsername() +".png -resize 100x100 "+ MyVaadinUI.MYFILEPATH + "images/" + ((MyVaadinUI)UI.getCurrent()).getCurrentUser().getUsername() + ".png";
         try {
             Process process = Runtime.getRuntime().exec(cmd);
             process.waitFor();
@@ -65,7 +65,7 @@ public class FileUploader extends CustomComponent implements Upload.Receiver, Up
 
             he.setSource(new FileResource(new File(MyVaadinUI.MYFILEPATH + "images/he.jpg")));
             she.setSource(new FileResource(new File(MyVaadinUI.MYFILEPATH + "images/she.jpg")));
-            own.setSource(new FileResource(new File(MyVaadinUI.MYFILEPATH + "images/" + MyVaadinUI.currUser.getUsername() + ".png")));
+            own.setSource(new FileResource(new File(MyVaadinUI.MYFILEPATH + "images/" + ((MyVaadinUI)UI.getCurrent()).getCurrentUser().getUsername() + ".png")));
 
             HorizontalLayout images = new HorizontalLayout();
             images.addComponent(he);

@@ -163,8 +163,8 @@ public class TestView extends HorizontalSplitPanel implements View {
         listOfQuestions.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
-                if (listOfQuestions.getValue() != null && listOfQuestions.getParent(listOfQuestions.getValue()) == null && listOfQuestions.getValue()!=currQuestion.getId()){
-                    currQuestion = questionCom.getQuestion();
+                if (listOfQuestions.getValue() != null && listOfQuestions.getValue()!=currQuestion.getId()){
+                    //currQuestion = questionCom.getQuestion();
                     questionCom = new QuestionComponent(getQuestion(listOfQuestions.getValue()));
                     currQuestion = getQuestion(listOfQuestions.getValue());
                     setFirstComponent(questionCom);

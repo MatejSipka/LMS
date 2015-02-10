@@ -101,6 +101,9 @@
     <orderEntry type="library" name="Maven: org.vaadin.addons:RichTextToolbar:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: org.vaadin.addons:filteringtable:0.9.11.v7" level="project" />
     <orderEntry type="library" name="Maven: org.vaadin.addons:popupbutton:2.4.1" level="project" />
+    <orderEntry type="library" name="Maven: org.vaadin.addon:tableexport-for-vaadin:1.5.1.5" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi:3.10-FINAL" level="project" />
+    <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.5" level="project" />
   </component>
 </module>
 

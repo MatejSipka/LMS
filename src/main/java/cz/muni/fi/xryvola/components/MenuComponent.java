@@ -8,10 +8,7 @@ import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import cz.muni.fi.xryvola.MyVaadinUI;
-import cz.muni.fi.xryvola.navigateApp.StartView;
-import cz.muni.fi.xryvola.navigateApp.StudentMaterialsView;
-import cz.muni.fi.xryvola.navigateApp.TeacherMaterialsView;
-import cz.muni.fi.xryvola.navigateApp.TeacherStudentsView;
+import cz.muni.fi.xryvola.navigateApp.*;
 import cz.muni.fi.xryvola.services.FileUploader;
 import org.apache.shiro.SecurityUtils;
 import org.vaadin.cssinject.CSSInject;
@@ -42,9 +39,9 @@ public class MenuComponent extends CustomComponent {
         menuContent.addComponent(buildTitle());
         menuContent.addComponent(buildUserInfo());
 
-        if (MyVaadinUI.currUser.getRole().equals("TEACHER")) {
+        if (((MyVaadinUI)UI.getCurrent()).getCurrentUser().getRole().equals("TEACHER")) {
             buildTeacherContent();
-        }else if (MyVaadinUI.currUser.getRole().equals("STUDENT")){
+        }else if (((MyVaadinUI)UI.getCurrent()).getCurrentUser().getRole().equals("STUDENT")){
             buildStudentContent();
         }
         setCompositionRoot(menuContent);
@@ -55,6 +52,7 @@ public class MenuComponent extends CustomComponent {
         Button item0 = new Button("Domů");
         Button item1 = new Button("Studijní materiály");
         Button item2 = new Button("Třídy a žáci");
+        Button item3 = new Button("Statistiky");
 
         item0.setPrimaryStyleName("valo-menu-item");
         item0.setIcon(FontAwesome.HOME);
@@ -65,9 +63,13 @@ public class MenuComponent extends CustomComponent {
         item2.setPrimaryStyleName("valo-menu-item");
         item2.setIcon(FontAwesome.USERS);
 
+        item3.setPrimaryStyleName("valo-menu-item");
+        item3.setIcon(FontAwesome.BAR_CHART_O);
+
         menuContent.addComponent(item0);
         menuContent.addComponent(item1);
         menuContent.addComponent(item2);
+        menuContent.addComponent(item3);
 
         item0.addClickListener(new Button.ClickListener() {
             @Override
@@ -93,6 +95,14 @@ public class MenuComponent extends CustomComponent {
             }
         });
 
+        item3.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                UI.getCurrent().getNavigator().addView(MyVaadinUI.TEACHERSTATICS, new TeacherStaticsView());
+                UI.getCurrent().getNavigator().navigateTo(MyVaadinUI.TEACHERSTATICS);
+            }
+        });
+
         switch(currView){
             case 0: item0.addStyleName("selected");
                     break;
@@ -100,6 +110,7 @@ public class MenuComponent extends CustomComponent {
                     break;
             case 2: item2.addStyleName("selected");
                     break;
+            case 3: item3.addStyleName("selected");
         }
 
         Button logout = new Button("Odhlásit");
@@ -108,7 +119,7 @@ public class MenuComponent extends CustomComponent {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 SecurityUtils.getSubject().logout();
-                MyVaadinUI.currUser = null;
+                ((MyVaadinUI)UI.getCurrent()).setCurrentUser(null);
                 UI.getCurrent().getNavigator().navigateTo("");
             }
         });
@@ -180,7 +191,7 @@ public class MenuComponent extends CustomComponent {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 SecurityUtils.getSubject().logout();
-                MyVaadinUI.currUser = null;
+                ((MyVaadinUI)UI.getCurrent()).setCurrentUser(null);
                 UI.getCurrent().getNavigator().navigateTo("");
             }
         });
@@ -207,7 +218,7 @@ public class MenuComponent extends CustomComponent {
         CSSInject cssInject = new CSSInject(UI.getCurrent());
         cssInject.setStyles(".circular {width: 100px; height: 100px; border-radius: 150px; -webkit-border-radius: 150px; -moz-border-radius: 150px; margin: 10px;");
         userInfo.setComponentAlignment(userIcon, Alignment.TOP_CENTER);
-        userIcon.setSource(new FileResource(new File(MyVaadinUI.MYFILEPATH + "images/" + MyVaadinUI.currUser.getUsername() +".png")));
+        userIcon.setSource(new FileResource(new File(MyVaadinUI.MYFILEPATH + "images/" + ((MyVaadinUI)UI.getCurrent()).getCurrentUser().getUsername() +".png")));
         userIcon.addClickListener(
                 new MouseEvents.ClickListener() {
                     @Override
@@ -223,7 +234,7 @@ public class MenuComponent extends CustomComponent {
                         profilePic.setContent(lay);
                     }
                 });
-        Label userName = new Label(MyVaadinUI.currUser.getName());
+        Label userName = new Label(((MyVaadinUI)UI.getCurrent()).getCurrentUser().getName());
         userName.setPrimaryStyleName("username");
         CSSInject cssInjectName = new CSSInject(UI.getCurrent());
         cssInjectName.setStyles(".username{text-align: center; margin-bottom: 10px;}");
